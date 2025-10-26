@@ -22,7 +22,11 @@
 9. [API 문서](#-api-문서)
 10. [성능 최적화](#-성능-최적화)
 11. [보안 고려사항](#-보안-고려사항)
-12. [향후 계획](#-향후-계획)
+12. [JWT 인증 흐름 상세](./JWT.md)
+13. [AOP 문법 및 구현 상세](./AOP.md)
+14. [JPA & Transaction 생명주기](./JPA_TRANSACTION.md)
+15. [Spring Boot 핵심 개념](./SPRING_BOOT_CORE.md)
+16. [향후 계획](#-향후-계획)
 
 ---
 
@@ -94,6 +98,8 @@
 | **SpringDoc OpenAPI** | 2.3.0 | REST API 문서 자동화 |
 | **Lombok** | 1.18.30 | 보일러플레이트 코드 제거 |
 | **MapStruct** | 1.5.5 | DTO 매핑 |
+
+📖 **상세 문서**: Spring Boot의 핵심 개념(IoC/DI, Bean 생명주기, Scope 등)에 대한 자세한 설명은 **[SPRING_BOOT_CORE.md](./SPRING_BOOT_CORE.md)**를 참고하세요.
 
 ---
 
@@ -214,6 +220,8 @@ public String generateAccessToken(Authentication authentication) {
 - 토큰 서명 무결성 검증
 - 악의적 토큰 차단 (MalformedJwtException, ExpiredJwtException 처리)
 
+📖 **상세 문서**: JWT 인증 흐름의 자세한 설명은 **[JWT.md](./JWT.md)**를 참고하세요.
+
 ---
 
 ### 2. AOP 기반 로깅 및 트랜잭션 모니터링 ✅
@@ -269,6 +277,8 @@ public Object logServiceExecution(ProceedingJoinPoint joinPoint) throws Throwabl
 - ✅ 모든 계층에 일관된 로깅 정책 적용
 - ✅ 성능 병목 지점 자동 식별
 - ✅ 운영 환경 모니터링 기반 마련
+
+📖 **상세 문서**: AOP 개념, 용어, 문법에 대한 자세한 설명은 **[AOP.md](./AOP.md)**를 참고하세요.
 
 ---
 
@@ -382,6 +392,8 @@ public abstract class BaseEntity {
 - ✅ **Soft Delete**: 실제 삭제 없이 논리적 삭제 (데이터 복구 가능)
 - ✅ **규정 준수**: 금융/의료 등 규제 산업의 데이터 보존 요구사항 충족
 - ✅ **DRY 원칙**: 중복 코드 제거
+
+📖 **상세 문서**: JPA 엔티티 생명주기와 영속성 컨텍스트에 대한 자세한 설명은 **[JPA_TRANSACTION.md](./JPA_TRANSACTION.md)**를 참고하세요.
 
 ---
 
@@ -507,6 +519,8 @@ public class Permission extends BaseEntity {
 - 계층별 명확한 책임 분리
 - AOP를 통한 횡단 관심사 분리
 - 도메인 로직과 인프라 로직 분리
+
+📖 **상세 문서**: IoC/DI, Bean 생명주기, Component Scan 등 Spring의 핵심 동작 원리는 **[SPRING_BOOT_CORE.md](./SPRING_BOOT_CORE.md)**를 참고하세요.
 
 ---
 
@@ -735,6 +749,8 @@ public class UserService {
 | READ_COMMITTED | X | O | O | 일반적인 조회 |
 | REPEATABLE_READ | X | X | O | 동일 데이터 재조회 |
 | SERIALIZABLE | X | X | X | 결재, 송금 등 중요 작업 |
+
+📖 **상세 문서**: Transaction 생명주기, 전파 속성, 격리 수준에 대한 자세한 설명은 **[JPA_TRANSACTION.md](./JPA_TRANSACTION.md)**를 참고하세요.
 
 ---
 

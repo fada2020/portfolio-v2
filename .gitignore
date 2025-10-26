@@ -36,3 +36,12 @@ Thumbs.db
 
 # Spring Boot
 spring-boot-devtools.properties
+
+# Docker
+.dockerignore
+
+# Playwright
+.playwright-mcp/
+
+# EC2 keys
+*.pem

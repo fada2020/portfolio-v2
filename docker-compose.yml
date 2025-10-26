@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  smartwork:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: smartwork:latest
+    container_name: smartwork-app
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Spring Profile (프로덕션 모드)
+      - SPRING_PROFILES_ACTIVE=prod
+
+      # 데이터베이스 설정 (환경 변수로 오버라이드 가능)
+      # Oracle 사용 시
+      - DB_URL=${DB_URL:-jdbc:oracle:thin:@localhost:1521:ORCL}
+      - DB_USERNAME=${DB_USERNAME:-smartwork}
+      - DB_PASSWORD=${DB_PASSWORD:-smartwork123}
+
+      # JWT 시크릿 (반드시 변경 필요!)
+      - JWT_SECRET=${JWT_SECRET:-c21hcnR3b3JrLWp3dC1zZWNyZXQta2V5LWZvci1lbnRlcnByaXNlLWFwcGxpY2F0aW9uLXNlY3VyaXR5}
+
+      # JVM 메모리 설정 (프리티어 최적화)
+      - JAVA_OPTS=-Xmx512m -Xms256m -XX:MaxMetaspaceSize=128m
+
+      # 타임존
+      - TZ=Asia/Seoul
+
+    # 메모리 제한 (Docker 레벨)
+    mem_limit: 768m
+    mem_reservation: 512m
+
+    # 헬스체크
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+    # 로그 설정 (디스크 공간 절약)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # 네트워크
+    networks:
+      - smartwork-network
+
+networks:
+  smartwork-network:
+    driver: bridge
