@@ -41,6 +41,28 @@ public class JwtTokenProvider {
         return generateToken(authentication, refreshTokenValidityMs);
     }
 
+    /**
+     * Generate access token with username only (for login)
+     */
+    public String generateToken(String username) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + accessTokenValidityMs);
+
+        return Jwts.builder()
+                .subject(username)
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(secretKey, Jwts.SIG.HS512)
+                .compact();
+    }
+
+    /**
+     * Get access token expiration time in milliseconds
+     */
+    public long getExpirationTime() {
+        return accessTokenValidityMs;
+    }
+
     private String generateToken(Authentication authentication, long validityMs) {
         String username = authentication.getName();
         String authorities = authentication.getAuthorities().stream()

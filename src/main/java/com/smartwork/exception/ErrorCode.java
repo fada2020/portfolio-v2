@@ -32,8 +32,12 @@ public enum ErrorCode {
     // User Management (3xxx)
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "User not found"),
     DUPLICATE_USER(HttpStatus.CONFLICT, "U002", "User already exists"),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "U003", "Invalid password format"),
-    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U004", "Password confirmation mismatch"),
+    DUPLICATE_USERNAME(HttpStatus.CONFLICT, "U003", "Username already exists"),
+    DUPLICATE_EMAIL(HttpStatus.CONFLICT, "U004", "Email already exists"),
+    DUPLICATE_EMPLOYEE_ID(HttpStatus.CONFLICT, "U005", "Employee ID already exists"),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "U006", "Invalid password format"),
+    PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, "U007", "Password confirmation mismatch"),
+    CURRENT_PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST, "U008", "Current password is incorrect"),
 
     // Board Management (4xxx)
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "B001", "Board not found"),

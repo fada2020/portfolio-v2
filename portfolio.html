@@ -342,7 +342,8 @@
 
     <h3>주요 성과</h3>
     <div class="success-box">
-        <p><span class="checkmark">✅</span> <strong>16개 클래스</strong> - 도메인, 보안, AOP, 예외 처리 구현</p>
+        <p><span class="checkmark">✅</span> <strong>27개 클래스</strong> - 도메인, 보안, 서비스, 컨트롤러, DTO, AOP, 예외 처리 구현</p>
+        <p><span class="checkmark">✅</span> <strong>14개 REST API</strong> - 인증/인가, 회원 CRUD, 중복 체크 기능 완성</p>
         <p><span class="checkmark">✅</span> <strong>Production-Ready</strong> - 실제 운영 환경에 적용 가능한 수준의 코드 품질</p>
         <p><span class="checkmark">✅</span> <strong>확장 가능한 구조</strong> - 추가 기능 개발을 위한 유연한 아키텍처</p>
         <p><span class="checkmark">✅</span> <strong>엔터프라이즈 패턴</strong> - 대규모 시스템에서 검증된 설계 패턴 적용</p>
@@ -486,15 +487,22 @@
 │       │   │   ├── BaseEntity.java
 │       │   │   ├── User.java
 │       │   │   ├── Role.java
-│       │   │   ├── Permission.java
-│       │   │   └── UserStatus.java
+│       │   │   └── Permission.java
 │       │   │
 │       │   ├── repository/          # 데이터 액세스 계층
-│       │   │   ├── UserRepository.java
-│       │   │   ├── RoleRepository.java
-│       │   │   └── PermissionRepository.java
+│       │   │   └── UserRepository.java
+│       │   │
+│       │   ├── service/             # 비즈니스 로직
+│       │   │   ├── UserService.java
+│       │   │   └── AuthService.java
+│       │   │
+│       │   ├── controller/          # REST API 컨트롤러
+│       │   │   ├── UserController.java
+│       │   │   └── AuthController.java
 │       │   │
 │       │   ├── security/            # 보안 설정
+│       │   │   ├── config/
+│       │   │   │   └── SecurityConfig.java
 │       │   │   ├── jwt/
 │       │   │   │   └── JwtTokenProvider.java
 │       │   │   ├── filter/
@@ -510,7 +518,16 @@
 │       │   │
 │       │   ├── dto/                 # 데이터 전송 객체
 │       │   │   ├── ApiResponse.java
-│       │   │   └── ErrorResponse.java
+│       │   │   ├── ErrorResponse.java
+│       │   │   ├── user/
+│       │   │   │   ├── UserDto.java
+│       │   │   │   ├── UserCreateRequest.java
+│       │   │   │   ├── UserUpdateRequest.java
+│       │   │   │   ├── UserPasswordChangeRequest.java
+│       │   │   │   └── UserSearchCondition.java
+│       │   │   └── auth/
+│       │   │       ├── LoginRequest.java
+│       │   │       └── LoginResponse.java
 │       │   │
 │       │   ├── aop/                 # AOP 관점
 │       │   │   ├── LoggingAspect.java
@@ -540,14 +557,29 @@
         </thead>
         <tbody>
             <tr>
-                <td><strong>Domain</strong></td>
-                <td>비즈니스 로직과 규칙 정의</td>
-                <td>JPA Entity, Enum</td>
+                <td><strong>Controller</strong></td>
+                <td>HTTP 요청/응답 처리</td>
+                <td>@RestController, Validation</td>
+            </tr>
+            <tr>
+                <td><strong>Service</strong></td>
+                <td>비즈니스 로직 처리 및 트랜잭션 관리</td>
+                <td>@Service, @Transactional</td>
             </tr>
             <tr>
                 <td><strong>Repository</strong></td>
                 <td>데이터베이스 접근 추상화</td>
                 <td>Spring Data JPA</td>
+            </tr>
+            <tr>
+                <td><strong>Domain</strong></td>
+                <td>비즈니스 로직과 규칙 정의</td>
+                <td>JPA Entity, Enum</td>
+            </tr>
+            <tr>
+                <td><strong>DTO</strong></td>
+                <td>계층 간 데이터 전송</td>
+                <td>Validation, MapStruct</td>
             </tr>
             <tr>
                 <td><strong>Security</strong></td>
@@ -558,11 +590,6 @@
                 <td><strong>Exception</strong></td>
                 <td>전역 예외 처리</td>
                 <td>@RestControllerAdvice</td>
-            </tr>
-            <tr>
-                <td><strong>DTO</strong></td>
-                <td>계층 간 데이터 전송</td>
-                <td>Record, MapStruct</td>
             </tr>
             <tr>
                 <td><strong>AOP</strong></td>
@@ -695,9 +722,107 @@ public class LoggingAspect {
     }
 }</code></pre>
 
+    <h3>4. User Management API</h3>
+
+    <div class="info-box">
+        <p><strong>완전한 사용자 관리 시스템</strong>을 구현하여 회원 CRUD, 비밀번호 관리, 상태 관리, 중복 체크 기능을 제공합니다.</p>
+    </div>
+
+    <h4>구현 기능</h4>
+    <ul>
+        <li><strong>회원 가입/조회/수정/삭제</strong>: RESTful API로 완전한 CRUD 지원</li>
+        <li><strong>비밀번호 관리</strong>: BCrypt 암호화, 변경 시 현재 비밀번호 검증</li>
+        <li><strong>상태 관리</strong>: ACTIVE, INACTIVE, LOCKED, SUSPENDED, RESIGNED</li>
+        <li><strong>계정 보안</strong>: 5회 로그인 실패 시 1시간 자동 잠금</li>
+        <li><strong>Soft Delete</strong>: 물리적 삭제가 아닌 논리적 삭제로 데이터 보존</li>
+        <li><strong>Validation</strong>: Bean Validation으로 입력 데이터 검증</li>
+        <li><strong>페이징 지원</strong>: Spring Data JPA로 대량 데이터 효율적 조회</li>
+        <li><strong>중복 체크</strong>: 사용자명, 이메일, 사번 실시간 중복 확인</li>
+    </ul>
+
+    <h4>코드 예시 - User Service</h4>
+    <pre><code>@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class UserService {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Transactional
+    public UserDto createUser(UserCreateRequest request) {
+        // 중복 검증
+        validateUniqueConstraints(
+            request.getUsername(),
+            request.getEmail(),
+            request.getEmployeeId()
+        );
+
+        // 사용자 생성
+        User user = User.builder()
+            .username(request.getUsername())
+            .password(passwordEncoder.encode(request.getPassword()))
+            .email(request.getEmail())
+            .name(request.getName())
+            .status(User.UserStatus.ACTIVE)
+            .build();
+
+        return UserDto.fromEntity(userRepository.save(user));
+    }
+
+    @Transactional
+    public void changePassword(Long id, UserPasswordChangeRequest request) {
+        // 비밀번호 확인 검증
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
+            throw new BusinessException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        User user = findUserById(id);
+
+        // 현재 비밀번호 검증
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new BusinessException(ErrorCode.CURRENT_PASSWORD_INCORRECT);
+        }
+
+        // 비밀번호 업데이트
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+    }
+}</code></pre>
+
+    <h4>Validation 규칙</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>필드</th>
+                <th>검증 규칙</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>사용자명</strong></td>
+                <td>3-50자, 영문/숫자/하이픈/언더스코어만 허용</td>
+            </tr>
+            <tr>
+                <td><strong>비밀번호</strong></td>
+                <td>8-100자, 영문+숫자+특수문자 필수 포함</td>
+            </tr>
+            <tr>
+                <td><strong>이메일</strong></td>
+                <td>올바른 이메일 형식, 최대 100자</td>
+            </tr>
+            <tr>
+                <td><strong>전화번호</strong></td>
+                <td>010-1234-5678 형식 (선택)</td>
+            </tr>
+            <tr>
+                <td><strong>이름</strong></td>
+                <td>2-50자, 필수</td>
+            </tr>
+        </tbody>
+    </table>
+
     <div class="page-break"></div>
 
-    <h3>4. JPA Auditing을 통한 감사 추적</h3>
+    <h3>5. JPA Auditing을 통한 감사 추적</h3>
 
     <div class="info-box">
         <p>모든 엔티티의 <strong>생성/수정 이력을 자동으로 추적</strong>하여 데이터 변경 이력을 관리합니다.</p>
@@ -742,7 +867,7 @@ public abstract class BaseEntity {
     }
 }</code></pre>
 
-    <h3>5. 전역 예외 처리</h3>
+    <h3>6. 전역 예외 처리</h3>
 
     <div class="info-box">
         <p><strong>@RestControllerAdvice</strong>를 사용하여 모든 예외를 중앙에서 처리하고 일관된 에러 응답을 제공합니다.</p>
@@ -1229,41 +1354,61 @@ http://localhost:8080/swagger-ui.html
         </thead>
         <tbody>
             <tr>
-                <td rowspan="3"><strong>Auth</strong></td>
+                <td rowspan="2"><strong>Auth</strong></td>
                 <td>POST</td>
                 <td>/api/auth/login</td>
                 <td>로그인 (JWT 토큰 발급)</td>
             </tr>
             <tr>
                 <td>POST</td>
-                <td>/api/auth/refresh</td>
-                <td>Access Token 갱신</td>
+                <td>/api/auth/register</td>
+                <td>회원가입</td>
             </tr>
             <tr>
-                <td>POST</td>
-                <td>/api/auth/logout</td>
-                <td>로그아웃</td>
-            </tr>
-            <tr>
-                <td rowspan="4"><strong>User</strong></td>
-                <td>GET</td>
-                <td>/api/users/{id}</td>
-                <td>사용자 조회</td>
-            </tr>
-            <tr>
-                <td>GET</td>
-                <td>/api/users</td>
-                <td>사용자 목록 조회</td>
-            </tr>
-            <tr>
+                <td rowspan="9"><strong>User</strong></td>
                 <td>POST</td>
                 <td>/api/users</td>
                 <td>사용자 생성</td>
             </tr>
             <tr>
+                <td>GET</td>
+                <td>/api/users/{id}</td>
+                <td>사용자 ID로 조회</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/api/users/username/{username}</td>
+                <td>사용자 이름으로 조회</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/api/users</td>
+                <td>사용자 목록 조회 (페이징)</td>
+            </tr>
+            <tr>
                 <td>PUT</td>
                 <td>/api/users/{id}</td>
-                <td>사용자 수정</td>
+                <td>사용자 정보 수정</td>
+            </tr>
+            <tr>
+                <td>PUT</td>
+                <td>/api/users/{id}/password</td>
+                <td>비밀번호 변경</td>
+            </tr>
+            <tr>
+                <td>PUT</td>
+                <td>/api/users/{id}/status</td>
+                <td>사용자 상태 변경</td>
+            </tr>
+            <tr>
+                <td>DELETE</td>
+                <td>/api/users/{id}</td>
+                <td>사용자 삭제 (Soft Delete)</td>
+            </tr>
+            <tr>
+                <td>GET</td>
+                <td>/api/users/check/*</td>
+                <td>중복 체크 (username, email, employee-id)</td>
             </tr>
         </tbody>
     </table>
@@ -1646,14 +1791,16 @@ GET http://[EC2_IP]:8080/actuator/health
 
     <h3>Phase 1: 핵심 비즈니스 기능 구현 (현재 완료)</h3>
     <div class="success-box">
-        <p><span class="checkmark">✅</span> JWT 기반 인증/인가 시스템</p>
-        <p><span class="checkmark">✅</span> RBAC 권한 관리</p>
-        <p><span class="checkmark">✅</span> AOP 로깅 및 트랜잭션 모니터링</p>
-        <p><span class="checkmark">✅</span> 전역 예외 처리</p>
-        <p><span class="checkmark">✅</span> JPA Auditing 감사 추적</p>
-        <p><span class="checkmark">✅</span> Docker 컨테이너화</p>
-        <p><span class="checkmark">✅</span> GitHub Actions CI/CD 파이프라인</p>
-        <p><span class="checkmark">✅</span> AWS EC2 프리티어 배포</p>
+        <p><span class="checkmark">✅</span> <strong>JWT 기반 인증/인가 시스템</strong> - 로그인, 회원가입, 토큰 발급</p>
+        <p><span class="checkmark">✅</span> <strong>User Management API</strong> - 회원 CRUD, 비밀번호 변경, 상태 관리, 중복 체크</p>
+        <p><span class="checkmark">✅</span> <strong>RBAC 권한 관리</strong> - User-Role-Permission 3계층 모델</p>
+        <p><span class="checkmark">✅</span> <strong>Validation 체계</strong> - Bean Validation으로 입력 검증 (이메일, 비밀번호, 전화번호)</p>
+        <p><span class="checkmark">✅</span> <strong>AOP 로깅</strong> - 계층별 자동 로깅 및 성능 모니터링</p>
+        <p><span class="checkmark">✅</span> <strong>전역 예외 처리</strong> - 30+ 에러 코드, 일관된 에러 응답</p>
+        <p><span class="checkmark">✅</span> <strong>JPA Auditing</strong> - 생성/수정 이력 자동 추적</p>
+        <p><span class="checkmark">✅</span> <strong>Docker 컨테이너화</strong> - 멀티스테이지 빌드, 프리티어 최적화</p>
+        <p><span class="checkmark">✅</span> <strong>CI/CD 파이프라인</strong> - GitHub Actions 자동 배포</p>
+        <p><span class="checkmark">✅</span> <strong>Swagger 문서화</strong> - OpenAPI 3.0 자동 생성</p>
     </div>
 
     <h3>Phase 2: 추가 기능 개발 (진행 예정)</h3>
